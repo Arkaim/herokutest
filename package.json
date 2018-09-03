@@ -1,17 +1,19 @@
 {
-  "name": "telegramtestbot",
+  "name": "telegramtestbott",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "dependencies": {
+    "firebase": "^5.4.1",
+    "node-telegram-bot-api": "^0.30.0"
+  },
   "scripts": {
     "start": "node index.js"
   },
   "engines": {
-    "node": "9.10.1"
+    "node": "8.11.4"
   },
+  "devDependencies": {},
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "node-telegram-bot-api": "^0.30.0"
-  }
+  "license": "ISC"
 }
