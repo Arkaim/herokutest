@@ -312,11 +312,11 @@ bot.onText(/\/top/, msg => {
 		var len = players.length;
 		if (len > 10) 
 			len = 10;
-		var str = '';
+		var str = 'Топ 10 игроков: \n\n';
 		for (var i = 0; i < len; i++) {
 			str += (i + 1) + '. ' + players[i].fname + ' ' + players[i].fname + '\n'
-								+ players[i].faculty + ', ' + players[i].year + '\n'
-								+ players[i].killcount + ' убийств' + '\n\n';
+								+ '   ' + players[i].faculty + ', ' + players[i].year + '\n'
+								+ '   ' + players[i].killcount + ' убийств' + '\n\n';
 		}
 		bot.sendMessage(msg.chat.id, str);
 	});
