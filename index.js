@@ -231,8 +231,7 @@ bot.onText(/\/stats/, msg => {
 });
 
 bot.onText(/\/rules/, msg => {
-	var rand = Math.random().toString(36).slice(2).substr(0,10);
-	bot.sendMessage(msg.chat.id, rand);
+	bot.sendMessage(msg.chat.id, rules);
 });
 
 bot.onText(/\/report/, msg => {
