@@ -1,5 +1,5 @@
 
-const TOKEN = '640746920:AAGXCQjVubGbqsf-EHnTrwbVgQJ4ZDQ9DOk';
+const TOKEN = '586469686:AAG02bEenGq3uAz5Y-PZRZLCsieMLa8NsrU';
 var TelegramBot = require('node-telegram-bot-api');
 const options = {
   webHook: {
