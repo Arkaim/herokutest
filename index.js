@@ -47,7 +47,7 @@ bot.onText(/\/start/, msg => {
 bot.on('photo', (msg) => {
 	if (msg.chat.id === adminChatId) {
 		var ref = database.ref('players')
-		var player_id = Math.random().toString(36).slice(2).substr(0,10);
+		var player_id = Math.random().toString(36).slice(2).substr(0,6);
 
 		if (msg.caption !== "") {
 			var info = msg.caption;
