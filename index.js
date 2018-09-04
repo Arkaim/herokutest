@@ -72,13 +72,12 @@ bot.onText(/\/me/, msg => {
 				bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
 			}
 			else {
+				var refChatsList = database.ref('chats/' + msg.chat.id);
+				refChatsList.set(id);
 				ref.child('chat_id').set(msg.chat.id);
 				bot.sendMessage(msg.chat.id, 'Вы успешно зарегистрировались. Ожидайте начала игры.');
 			}
 		});
-
-		var refChatsList = database.ref('chats/' + msg.chat.id);
-		refChatsList.set(id);
 	} else {
 		bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
 	}
