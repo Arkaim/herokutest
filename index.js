@@ -25,7 +25,7 @@ var config = {
 var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
-const admins = ['arkaim', 'Amanzhol_T']
+const admins = ['Arkaim', 'Amanzhol_T']
 const rules = 'Rules';
 
 bot.onText(/\/start/, msg => {
