@@ -1,4 +1,3 @@
-
 const TOKEN = '586469686:AAG02bEenGq3uAz5Y-PZRZLCsieMLa8NsrU';
 var TelegramBot = require('node-telegram-bot-api');
 const options = {
@@ -64,25 +63,29 @@ bot.on('photo', (msg) => {
 bot.onText(/\/me/, msg => {
 	var id = msg.text.slice(4);
 	id = id.trim();
-	var ref = database.ref('/players/' + id);
 
-	ref.once('value', function(snapshot) {
-		var test = snapshot.val();
-		if (test === null) {
-			bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
-		}
-		else {
-			ref.child('chat_id').set(msg.chat.id);
-			bot.sendMessage(msg.chat.id, 'Вы успешно зарегистрировались. Ожидайте начала игры.');
-		}
-	});
+	if (id !== '') {
+		var ref = database.ref('/players/' + id);
+		ref.once('value', function(snapshot) {
+			var test = snapshot.val();
+			if (test === null) {
+				bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
+			}
+			else {
+				ref.child('chat_id').set(msg.chat.id);
+				bot.sendMessage(msg.chat.id, 'Вы успешно зарегистрировались. Ожидайте начала игры.');
+			}
+		});
 
-	var refChatsList = database.ref('chats/' + msg.chat.id);
-	refChatsList.set(id);
+		var refChatsList = database.ref('chats/' + msg.chat.id);
+		refChatsList.set(id);
+	} else {
+		bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
+	}
 });
 
 bot.onText(/\/begin_game/, msg => {
-	if (msg.chat.id === adminChatId) {
+	if (admins.includes(msg.from.username)) {
 		var ref = database.ref('/players');
 		ref.once('value', function(snapshot) {
 			var players = [];
@@ -190,6 +193,7 @@ bot.onText(/\/kill/, msg => {
 
 bot.onText(/\/code/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
+	console.log(msg.chat.id);
 	chatIdRef.once('value', function(snapshot) {
 		if (snapshot.val() === null) {
 			bot.sendMessage(msg.chat.id, 'Вы не зарегистрированы');
@@ -230,7 +234,7 @@ bot.onText(/\/report/, msg => {
 });
 
 bot.onText(/\/broadcast/, msg => {
-	if (msg.chat.id === adminChatId) {
+	if (admins.includes(msg.from.username)) {
 		var broadcastMsg = msg.text.slice(11);
 		if (broadcastMsg !== '') {
 			var registeredChatsRef = database.ref('chats');
@@ -248,7 +252,7 @@ bot.onText(/\/broadcast/, msg => {
 });
 
 bot.onText(/\/delete/, msg => {
-	if (msg.chat.id === adminChatId) {
+	if (admins.includes(msg.from.username)) {
 		if (msg.text[7] === " ") {
 			var id = msg.text.slice(8)
 			if (id !== "") {
