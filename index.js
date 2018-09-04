@@ -133,65 +133,66 @@ bot.onText(/\/begin_game/, msg => {
 bot.onText(/\/kill/, msg => {
 	var id = msg.text.slice(6);
 	id = id.trim();
-	var victimRef = database.ref('/players/' + id);
 
-	victimRef.once('value', function(snapshot) {
-		var test = snapshot.val();
-		if (test === null) {
-			bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
-		} else {
-			var killerChatRef = database.ref('chats/' + msg.chat.id);
-			killerChatRef.once('value', function(killerChatRefSnap) {
-				var killer_id = killerChatRefSnap.val();
-				var killerRef = database.ref('players/' + killer_id);
-				killerRef.once('value', function(killerSnap) {
-					if (killerSnap.val().status === 'alive') {
-						var victim_id = killerSnap.val().victim;
-						var selfKIll = 'Не знаете ли, что тела ваши суть храм живущего в вас Святого Духа, Которого имеете вы от Бога, и вы не свои? Ибо вы куплены дорогою ценою';
-						if (id === killerSnap.key) {
-							bot.sendMessage(msg.chat.id, selfKIll);
-						} 
-						else if (id === victim_id) {
-							var killer_killcount = killerSnap.val().killcount;
-							var killerKillCountRef = database.ref('players/' + killer_id + '/killcount');
-							killerKillCountRef.set(parseInt(killer_killcount)+1);
-							var killerKillListRef = database.ref('players/' + killer_id + '/kills/' + new Date());
-							killerKillListRef.set(victim_id);
+	if (id !== '') {
+		var victimRef = database.ref('/players/' + id);
+		victimRef.once('value', function(snapshot) {
+			var test = snapshot.val();
+			if (test === null) {
+				bot.sendMessage(msg.chat.id, 'null Убийство не удалось, проверьте правильность команды.');
+			} else {
+				var killerChatRef = database.ref('chats/' + msg.chat.id);
+				killerChatRef.once('value', function(killerChatRefSnap) {
+					var killer_id = killerChatRefSnap.val();
+					var killerRef = database.ref('players/' + killer_id);
+					killerRef.once('value', function(killerSnap) {
+						if (killerSnap.val().status === 'alive') {
+							var victim_id = killerSnap.val().victim;
+							var selfKIll = 'Не знаете ли, что тела ваши суть храм живущего в вас Святого Духа, Которого имеете вы от Бога, и вы не свои? Ибо вы куплены дорогою ценою';
+							if (id === killerSnap.key) {
+								bot.sendMessage(msg.chat.id, selfKIll);
+							} 
+							else if (id === victim_id) {
+								var killer_killcount = killerSnap.val().killcount;
+								var killerKillCountRef = database.ref('players/' + killer_id + '/killcount');
+								killerKillCountRef.set(parseInt(killer_killcount)+1);
+								var killerKillListRef = database.ref('players/' + killer_id + '/kills/' + new Date());
+								killerKillListRef.set(victim_id);
 
-							var victimStatusRef = database.ref('players/' + victim_id + '/status');
-							victimStatusRef.set('dead');
-							bot.sendMessage(snapshot.val().chat_id, 'Вы были убиты!');
+								var victimStatusRef = database.ref('players/' + victim_id + '/status');
+								victimStatusRef.set('dead');
+								bot.sendMessage(snapshot.val().chat_id, 'Вы были убиты!');
 
-							var nextVictimRef = database.ref('players/' + snapshot.val().victim);
-							nextVictimRef.once('value', function(nextVictimSnap) {
-								var newKillerVictimRef = database.ref('players/' + killer_id + '/victim');
-								newKillerVictimRef.set(nextVictimSnap.key);	
-								var newKillerVictimInfo = nextVictimSnap.val().fname + ' ' 
-														+ nextVictimSnap.val().lname + ', '
-														+ nextVictimSnap.val().faculty + ', '
-														+ nextVictimSnap.val().year;
+								var nextVictimRef = database.ref('players/' + snapshot.val().victim);
+								nextVictimRef.once('value', function(nextVictimSnap) {
+									var newKillerVictimRef = database.ref('players/' + killer_id + '/victim');
+									newKillerVictimRef.set(nextVictimSnap.key);	
+									var newKillerVictimInfo = nextVictimSnap.val().fname + ' ' 
+															+ nextVictimSnap.val().lname + ', '
+															+ nextVictimSnap.val().faculty + ', '
+															+ nextVictimSnap.val().year;
 
-								bot.sendMessage(msg.chat.id, 'Вы убили свою жертву!');
-								setTimeout(function() {
-									bot.sendPhoto(msg.chat.id, nextVictimSnap.val().photo_id, {caption: 'Ваша следующая жертва \n' 
-																										+ newKillerVictimInfo});
-								}, 2000);
-							});
+									bot.sendMessage(msg.chat.id, 'Вы убили свою жертву!');
+									setTimeout(function() {
+										bot.sendPhoto(msg.chat.id, nextVictimSnap.val().photo_id, {caption: 'Ваша следующая жертва \n' 
+																											+ newKillerVictimInfo});
+									}, 2000);
+								});
+							} else {
+								bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
+							}
 						} else {
-							bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
-						}
-					} else {
-						bot.sendMessage(msg.chat.id, 'Вы мертвы');
-					}					
+							bot.sendMessage(msg.chat.id, 'Вы мертвы');
+						}					
+					});
 				});
-			});
-		}
-	});
+			}
+		});
+	}
 });
 
 bot.onText(/\/code/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
-	console.log(msg.chat.id);
 	chatIdRef.once('value', function(snapshot) {
 		if (snapshot.val() === null) {
 			bot.sendMessage(msg.chat.id, 'Вы не зарегистрированы');
