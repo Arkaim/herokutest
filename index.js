@@ -5,7 +5,6 @@ const options = {
     port: process.env.PORT
   }
 };
-
 const url = process.env.APP_URL || 'https://slayerbot2018.herokuapp.com:443';
 const bot = new TelegramBot(TOKEN, options);
 
