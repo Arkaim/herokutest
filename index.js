@@ -3,28 +3,15 @@ const TOKEN = '586469686:AAG02bEenGq3uAz5Y-PZRZLCsieMLa8NsrU';
 var TelegramBot = require('node-telegram-bot-api');
 const options = {
   webHook: {
-    // Port to which you should bind is assigned to $PORT variable
-    // See: https://devcenter.heroku.com/articles/dynos#local-environment-variables
     port: process.env.PORT
-    // you do NOT need to set up certificates since Heroku provides
-    // the SSL certs already (https://<app-name>.herokuapp.com)
-    // Also no need to pass IP because on Heroku you need to bind to 0.0.0.0
   }
 };
-// Heroku routes from port :443 to $PORT
-// Add URL of your app to env variable or enable Dyno Metadata
-// to get this automatically
-// See: https://devcenter.heroku.com/articles/dyno-metadata
+
 const url = process.env.APP_URL || 'https://slayerbot2018.herokuapp.com:443';
 const bot = new TelegramBot(TOKEN, options);
 
-
-// This informs the Telegram servers of the new webhook.
-// Note: we do not need to pass in the cert, as it already provided
 bot.setWebHook(`${url}/bot${TOKEN}`);
 
-
-// Just to ping!
 const hellomsg = 'This is slayer test bot'
 var firebase = require('firebase');
 var config = {
@@ -37,7 +24,8 @@ var config = {
 };
 var app = firebase.initializeApp(config);
 var database = firebase.database();
-const adminChatId = 100491880; //may change
+const adminChatId = 100491880;
+const admins = ['arkaim', 'Amanzhol_T']
 const rules = 'Rules';
 
 bot.onText(/\/start/, msg => {
@@ -45,7 +33,7 @@ bot.onText(/\/start/, msg => {
 });
 
 bot.on('photo', (msg) => {
-	if (msg.chat.id === adminChatId) {
+	if (admins.includes(msg.from.username)) {
 		var ref = database.ref('players')
 		var player_id = Math.random().toString(36).slice(2).substr(0,6);
 
@@ -61,7 +49,7 @@ bot.on('photo', (msg) => {
 				ref.child(player_id).child("photo_id").set(msg.photo[msg.photo.length - 1].file_id);
 				ref.child(player_id).child("status").set('alive');
 				ref.child(player_id).child("killcount").set(0);
-				bot.sendMessage(msg.chat.id, 'Пользователь успешно зарегистрирован');
+				bot.sendMessage(msg.chat.id, player_id);
 			} else {
 				bot.sendMessage(msg.chat.id, 'Регистрация не удалась. Вы некорректно ввели данные');
 			}
@@ -98,7 +86,7 @@ bot.onText(/\/begin_game/, msg => {
 		var ref = database.ref('/players');
 		ref.once('value', function(snapshot) {
 			var players = [];
-			
+
 			snapshot.forEach(function(childSnapshot) {
 				var chat_id = childSnapshot.val().chat_id;
 				if (chat_id !== undefined) {
