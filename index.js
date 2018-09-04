@@ -315,7 +315,7 @@ bot.onText(/\/top/, msg => {
 		var str = 'Топ 10 игроков: \n\n';
 		for (var i = 0; i < len; i++) {
 			str += (i + 1) + '. 😶 ' + players[i].fname + ' ' + players[i].lname + ', '
-								+ ' ' + players[i].faculty + ', ' + players[i].year + ' курс, 🔪'
+							  + players[i].faculty + ', ' + players[i].year + ' курс, 🔪'
 							  + players[i].killcount + ' убийств' + '\n\n';
 		}
 		bot.sendMessage(msg.chat.id, str);
