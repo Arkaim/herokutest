@@ -68,17 +68,17 @@ bot.onText(/\/me/, msg => {
 		ref.once('value', function(snapshot) {
 			var test = snapshot.val();
 			if (test === null) {
-				bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
+				bot.sendMessage(msg.chat.id, 'Авторизация не удалась, проверьте правильность команды.');
 			}
 			else {
 				var refChatsList = database.ref('chats/' + msg.chat.id);
 				refChatsList.set(id);
 				ref.child('chat_id').set(msg.chat.id);
-				bot.sendMessage(msg.chat.id, 'Вы успешно зарегистрировались. Ожидайте начала игры.');
+				bot.sendMessage(msg.chat.id, 'Вы успешно авторизованы. Ожидайте начала игры.');
 			}
 		});
 	} else {
-		bot.sendMessage(msg.chat.id, 'Регистрация не удалась, проверьте правильность команды.');
+		bot.sendMessage(msg.chat.id, 'Авторизация не удалась, проверьте правильность команды.');
 	}
 });
 
@@ -195,7 +195,7 @@ bot.onText(/\/code/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
 	chatIdRef.once('value', function(snapshot) {
 		if (snapshot.val() === null) {
-			bot.sendMessage(msg.chat.id, 'Вы не зарегистрированы');
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
 		} else {
 			bot.sendMessage(msg.chat.id, 'Ваш секретный код: ' + snapshot.val());
 		}
@@ -206,7 +206,7 @@ bot.onText(/\/stats/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
 	chatIdRef.once('value', function(snapshot) {
 		if (snapshot.val() === null) {
-			bot.sendMessage(msg.chat.id, 'Вы не зарегистрированы');
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
 		} else {
 			var playerRef = database.ref('players/' + snapshot.val());
 			playerRef.once('value', function(playerSnap) {
