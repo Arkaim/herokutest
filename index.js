@@ -222,7 +222,7 @@ bot.onText(/\/stats/, msg => {
 });
 
 bot.onText(/\/rules/, msg => {
-	bot.sendMessage(msg.chat.id, rules);
+	bot.sendMessage(msg.chat.id, "Полный список правил по ссылке: https://vk.com/@profit_kbtu-pravila-igry-slayer");
 });
 
 bot.onText(/\/report/, msg => {
