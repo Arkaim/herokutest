@@ -313,6 +313,29 @@ bot.onText(/\/top/, msg => {
 	});
 });
 
+bot.onText(/\/victim/, msg => {
+	var chatRef = database.ref('/chats/' + msg.chat.id);
+	chatRef.once('value', function(snapshot) {
+		if (snapshot.val() !== null) {
+			var player_id = snapshot.val();
+			var playerRef = database.ref('players/' + player_id);
+			playerRef.once('value', function(playerSnap) {
+				var victim_id = playerSnap.val().victim;
+				var victimRef = database.ref('players/' + victim_id);
+				victimRef.once('value', function(victimSnap) {
+					var victimInfo  = victimSnap.val().fname + ' ' 
+									+ victimSnap.val().lname + ', '
+									+ victimSnap.val().faculty + ', '
+									+ victimSnap.val().year; 
+					bot.sendPhoto(msg.chat.id, victimSnap.val().photo_id, {caption: 'Ваша жертва: \n' + victimInfo});
+				});
+			});
+		} else {
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
+		}
+	});
+});
+
 function shuffle(arr) {
     var cnt = arr.length, temp, index;
     while (cnt > 0) {
