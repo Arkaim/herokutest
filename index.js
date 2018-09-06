@@ -24,7 +24,7 @@ var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
 const admins = ['Arkaim', 'Amanzhol_T']
-const rules = 'Rules';
+
 
 bot.onText(/\/start/, msg => {
 	bot.sendMessage(msg.chat.id, hellomsg);
@@ -78,7 +78,7 @@ bot.onText(/\/me/, msg => {
 			}
 		});
 	} else {
-		bot.sendMessage(msg.chat.id, 'Авторизация не удалась, проверьте правильность команды.');
+		bot.sendMessage(msg.chat.id, 'Введите /me и ваш код');
 	}
 });
 
