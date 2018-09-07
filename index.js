@@ -23,7 +23,7 @@ var config = {
 var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
-const admins = ['Arkaim', 'Amanzhol_T']
+const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 'Zhanserik_Shakenov'];
 
 
 bot.onText(/\/start/, msg => {
