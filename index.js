@@ -37,8 +37,8 @@ bot.on('photo', (msg) => {
 
 		if (msg.caption !== "") {
 			var info = msg.caption;
-			info = info.replace(/ /g,'');
-			var arr = info.split(',');
+			// info = info.replace(/ /g,'');
+			var arr = info.split(' ');
 			if (arr.length === 4) {
 				ref.child(player_id).child("fname").set(arr[0]);
 				ref.child(player_id).child("lname").set(arr[1]);
