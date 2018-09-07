@@ -23,7 +23,7 @@ var config = {
 var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
-const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 'Zhanserik_Shakenov'];
+const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK'];
 
 
 bot.onText(/\/start/, msg => {
@@ -139,7 +139,7 @@ bot.onText(/\/kill/, msg => {
 		victimRef.once('value', function(snapshot) {
 			var test = snapshot.val();
 			if (test === null) {
-				bot.sendMessage(msg.chat.id, 'null Убийство не удалось, проверьте правильность команды.');
+				bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
 			} else {
 				var killerChatRef = database.ref('chats/' + msg.chat.id);
 				killerChatRef.once('value', function(killerChatRefSnap) {
@@ -288,6 +288,7 @@ bot.onText(/\/delete/, msg => {
 	}
 });
 
+//todo: if chat_id !== null
 bot.onText(/\/top/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.once('value', function(snapshot) {
