@@ -37,7 +37,7 @@ bot.on('photo', (msg) => {
 
 		if (msg.caption !== "") {
 			var info = msg.caption;
-			// info = info.replace(/ /g,'');
+			// info = info.replace(/ /g,''); Теперь формат ввода "Имя Фамилия Факультет Курс" без запятых
 			var arr = info.split(' ');
 			if (arr.length === 4) {
 				ref.child(player_id).child("fname").set(arr[0]);
@@ -242,7 +242,7 @@ bot.onText(/\/broadcast/, msg => {
 					//todo: test it
 					setTimeout(function() {
 						bot.sendMessage(childSnapshot.key, broadcastMsg);
-					}, 1000);
+					}, 40); //Изменил с 1000 до 40, дабы проверить
 				});
 			});
 
