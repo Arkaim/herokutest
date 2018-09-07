@@ -47,7 +47,7 @@ bot.on('photo', (msg) => {
 				ref.child(player_id).child("photo_id").set(msg.photo[msg.photo.length - 1].file_id);
 				ref.child(player_id).child("status").set('alive');
 				ref.child(player_id).child("killcount").set(0);
-				bot.sendMessage(msg.chat.id, player_id);
+				bot.sendMessage(msg.chat.id, 'Регистрация прошла успешно! Код игрока: ' + player_id);
 			} else {
 				bot.sendMessage(msg.chat.id, 'Регистрация не удалась. Вы некорректно ввели данные');
 			}
@@ -99,7 +99,7 @@ bot.onText(/\/begin_game/, msg => {
 				(function(i) {
 					setTimeout(function() {
 						bot.sendMessage(players[i].val().chat_id, 'Игра началсь, ' + players[i].val().fname + '! \n' + 'Скоро вам выдадут жертву!');
-					}, 1000);
+					}, 40);
 				}(i));
 			}
 
