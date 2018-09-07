@@ -130,8 +130,8 @@ bot.onText(/\/begin_game/, msg => {
 	}
 });
 
-bot.onText(/\/kill/, msg => {
-	var id = msg.text.slice(6);
+bot.onText(/\/kill (.+)/, (msg, match) => {
+	var id = match[1];
 	id = id.trim();
 
 	if (id !== '') {
