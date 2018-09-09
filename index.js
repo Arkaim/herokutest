@@ -10,7 +10,7 @@ const bot = new TelegramBot(TOKEN, options);
 
 bot.setWebHook(`${url}/bot${TOKEN}`);
 
-const hellomsg = 'Привет от организации ProFIT! Это бот для игры в Slayer. Для авторизации отправьте боту комманду /me и через пробел свой уникальный код, выданный нами. \nНапример: \n\n/me abc123';
+const hellomsg = 'Для авторизации отправьте боту комманду /me и через пробел свой уникальный код, выданный нами. \nНапример: \n\n/me abc123';
 var firebase = require('firebase');
 var config = {
 	apiKey: "AIzaSyAVrpgXMgkKj-ytkYQft83giJ3dQdLMSCo",
@@ -302,7 +302,7 @@ bot.onText(/\/top/, msg => {
 	playersRef.once('value', function(snapshot) {
 		var players = [];
 		snapshot.forEach(function(childSnapshot) {
-			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== null) {
+			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== '') {
 				players.push(childSnapshot.val());
 			}
 		});
