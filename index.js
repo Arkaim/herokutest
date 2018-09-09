@@ -10,7 +10,7 @@ const bot = new TelegramBot(TOKEN, options);
 
 bot.setWebHook(`${url}/bot${TOKEN}`);
 
-const hellomsg = 'Привет от организации ProFIT! Это бот для игры в Slayer. Для авторизации отправьте боту комманду /me и через пробел свой уникальный код, выданный нами. Например: \n/me abc123';
+const hellomsg = 'Привет от организации ProFIT! Это бот для игры в Slayer. Для авторизации отправьте боту комманду /me и через пробел свой уникальный код, выданный нами. \nНапример: \n\n/me abc123';
 var firebase = require('firebase');
 var config = {
 	apiKey: "AIzaSyAVrpgXMgkKj-ytkYQft83giJ3dQdLMSCo",
@@ -293,12 +293,14 @@ bot.onText(/\/delete/, msg => {
 });
 
 //todo: if chat_id !== null
+
+*/
 bot.onText(/\/top/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.once('value', function(snapshot) {
 		var players = [];
 		snapshot.forEach(function(childSnapshot) {
-			if (childSnapshot.val().status === 'alive') {
+			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== null) {
 				players.push(childSnapshot.val());
 			}
 		});
@@ -317,7 +319,7 @@ bot.onText(/\/top/, msg => {
 		bot.sendMessage(msg.chat.id, str);
 	});
 });
-
+/*
 bot.onText(/\/victim/, msg => {
 	var chatRef = database.ref('/chats/' + msg.chat.id);
 	chatRef.once('value', function(snapshot) {
