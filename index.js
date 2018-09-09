@@ -10,7 +10,7 @@ const bot = new TelegramBot(TOKEN, options);
 
 bot.setWebHook(`${url}/bot${TOKEN}`);
 
-const hellomsg = 'This is slayer test bot'
+const hellomsg = 'Привет от организации ProFIT! Это бот для игры в Slayer. Для авторизации отправьте боту комманду /me и через пробел свой уникальный код, выданный нами. Например: \n/me abc123';
 var firebase = require('firebase');
 var config = {
 	apiKey: "AIzaSyAVrpgXMgkKj-ytkYQft83giJ3dQdLMSCo",
@@ -23,7 +23,9 @@ var config = {
 var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
-const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK'];
+const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 
+				'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 
+				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK'];
 
 
 bot.onText(/\/start/, msg => {
@@ -82,6 +84,7 @@ bot.onText(/\/me/, msg => {
 	}
 });
 
+/*
 bot.onText(/\/begin_game/, msg => {
 	if (admins.includes(msg.from.username)) {
 		var ref = database.ref('/players');
@@ -219,7 +222,7 @@ bot.onText(/\/stats/, msg => {
 			});
 		}
 	});
-});
+});*/
 
 bot.onText(/\/rules/, msg => {
 	bot.sendMessage(msg.chat.id, "Полный список правил по ссылке: https://vk.com/@profit_kbtu-pravila-igry-slayer");
@@ -232,6 +235,7 @@ bot.onText(/\/report/, msg => {
 	}
 });
 
+/*
 bot.onText(/\/broadcast/, msg => {
 	if (admins.includes(msg.from.username)) {
 		var broadcastMsg = msg.text.slice(11);
@@ -348,7 +352,7 @@ function shuffle(arr) {
     }
     return arr;
 }
-
+*/
 
 
 
