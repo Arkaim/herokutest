@@ -135,6 +135,7 @@ bot.onText(/\/begin_game/, msg => {
 	}
 });
 */
+/*
 bot.onText(/\/kill/, msg => {
 	var id = msg.text.slice(6);
 	id = id.trim();
@@ -195,6 +196,7 @@ bot.onText(/\/kill/, msg => {
 		});
 	}
 });
+*/
 /*
 bot.onText(/\/code/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
@@ -231,15 +233,14 @@ bot.onText(/\/rules/, msg => {
 });
 
 bot.onText(/\/report/, msg => {
-	var reportText = msg.text.slice(7);
+	var reportText = msg.text.slice(8);
 	if (reportText !== '') {
 		bot.sendMessage(adminChatId, 'Report from ' + msg.chat.id + '\n' + reportText);
 	}
 });
 
-/*
 bot.onText(/\/broadcast/, msg => {
-	if (admins.includes(msg.from.username)) {
+	if (msg.chat.id === adminChatId) {
 		var broadcastMsg = msg.text.slice(11);
 		if (broadcastMsg !== '') {
 			var registeredChatsRef = database.ref('chats');
@@ -248,14 +249,14 @@ bot.onText(/\/broadcast/, msg => {
 					//todo: test it
 					setTimeout(function() {
 						bot.sendMessage(childSnapshot.key, broadcastMsg);
-					}, 40); //Изменил с 1000 до 40, дабы проверить
+					}, 1000); //Изменил с 1000 до 40, дабы проверить
 				});
 			});
 
 		}
 	}
 });
-
+/*
 bot.onText(/\/delete/, msg => {
 	if (admins.includes(msg.from.username)) {
 		if (msg.text[7] === " ") {
@@ -296,7 +297,7 @@ bot.onText(/\/delete/, msg => {
 
 //todo: if chat_id !== null
 
-*/
+
 bot.onText(/\/top/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.once('value', function(snapshot) {
@@ -321,7 +322,7 @@ bot.onText(/\/top/, msg => {
 		bot.sendMessage(msg.chat.id, str);
 	});
 });
-/*
+
 bot.onText(/\/victim/, msg => {
 	var chatRef = database.ref('/chats/' + msg.chat.id);
 	chatRef.once('value', function(snapshot) {
