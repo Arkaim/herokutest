@@ -302,8 +302,7 @@ bot.onText(/\/top/, msg => {
 	playersRef.once('value', function(snapshot) {
 		var players = [];
 		snapshot.forEach(function(childSnapshot) {
-			if (childSnapshot.val().status === 'alive') {
-				console.log(childSnapshot.val().chat_id);
+			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== undefined) {
 				players.push(childSnapshot.val());
 			}
 		});
