@@ -25,7 +25,8 @@ var database = firebase.database();
 const adminChatId = 100491880;
 const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 
 				'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 
-				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK'];
+				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK', 'darlaxxii', 'kenenalmat',
+				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak'];
 
 
 bot.onText(/\/start/, msg => {
@@ -49,6 +50,7 @@ bot.on('photo', (msg) => {
 				ref.child(player_id).child("photo_id").set(msg.photo[msg.photo.length - 1].file_id);
 				ref.child(player_id).child("status").set('alive');
 				ref.child(player_id).child("killcount").set(0);
+				ref.child(player_id).child("admin").set(msg.from.username);
 				bot.sendMessage(msg.chat.id, 'Регистрация прошла успешно! Код игрока: ' + player_id);
 			} else {
 				bot.sendMessage(msg.chat.id, 'Регистрация не удалась. Вы некорректно ввели данные');
@@ -132,7 +134,7 @@ bot.onText(/\/begin_game/, msg => {
 		});
 	}
 });
-
+*/
 bot.onText(/\/kill/, msg => {
 	var id = msg.text.slice(6);
 	id = id.trim();
@@ -193,7 +195,7 @@ bot.onText(/\/kill/, msg => {
 		});
 	}
 });
-
+/*
 bot.onText(/\/code/, msg => {
 	var chatIdRef = database.ref('chats/' + msg.chat.id);
 	chatIdRef.once('value', function(snapshot) {
@@ -403,4 +405,16 @@ function shuffle(arr) {
 /report text (сообщение админу (хз нужно или нет))
 /rules 
 
+
+
+
+Привет я Slayer Bot 🤖
+Я помогу тебе авторизироваться, убить свою жертву, смотреть ТОП игроков и много чего еще!
+Вот список доступных комманд: 
+
+
+
+
 */
+
+
