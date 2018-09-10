@@ -244,10 +244,16 @@ bot.onText(/\/check_amount/, msg => {
 	if(msg.chat.id === adminChatId) {
 		var playersRef = database.ref('/players');
 		playersRef.once('value', function(snapshot) {
-			var registeredCount = snapshot.numChildren;
+			var registeredCount = 0;
+			snapshot.forEach(function(child) {
+				registeredCount += 1;
+			});
 			var chatsRef = database.ref('/chats');
 			chatsRef.once('value', function(snap) {
-				var authorizedCount = snap.numChildren;
+				var authorizedCount = 0;
+				snap.forEach(function(childSnap) {
+					authorizedCount += 1;
+				})
 				bot.sendMessage(adminChatId, 'Registered: ' + registeredCount + '\nAuthorized: ' + authorizedCount);
 			});
 		});
@@ -264,7 +270,6 @@ bot.onText(/\/check_faculty/, msg => {
 				switch(faculty) {
 					case 'фит':
 						fitCnt += 1;
-						break;
 					case 'мшэ':
 						iseCnt += 1;
 						break;
@@ -310,16 +315,16 @@ bot.onText(/\/check_course/, msg => {
 			snapshot.forEach(function(childSnapshot) {
 				var course = childSnapshot.val().year;
 				switch(course) {
-					case '1':
+					case 1:
 						firstCnt += 1;
 						break;
-					case '2':
+					case 2:
 						secondCnt += 1;
 						break;
-					case '3':
+					case 3:
 						thirdCnt += 1;
 						break;
-					case '4':
+					case 4:
 						fourthCnt += 1;
 						break;
 					default:
