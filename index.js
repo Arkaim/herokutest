@@ -26,7 +26,8 @@ const adminChatId = 100491880;
 const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 
 				'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 
 				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK', 'darlaxxii', 'kenenalmat',
-				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak', 'AntiEG0', 'muraliq'];
+				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak', 'AntiEG0', 'muraliq',
+			'hafsamufassir',];
 
 
 bot.onText(/\/start/, msg => {
