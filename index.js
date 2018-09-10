@@ -240,6 +240,101 @@ bot.onText(/\/report/, msg => {
 	}
 });
 
+bot.onText(/\/check_amount/, msg => {
+	if(msg.chat.id === adminChatId) {
+		var playersRef = database.ref('/players');
+		playersRef.once('value', function(snapshot) {
+			var registeredCount = snapshot.numChildren;
+			var chatsRef = database.ref('/chats');
+			chatsRef.once('value', function(snap) {
+				var authorizedCount = snap.numChildren;
+				bot.sendMessage(adminChatId, 'Registered: ' + registeredCount + '\nAuthorized: ' + authorizedCount);
+			});
+		});
+	}
+});
+
+bot.onText(/\/check_faculty/, msg => {
+	if(msg.chat.id === adminChatId) {
+		var playersRef = database.ref('/players');
+		var fitCnt = 0, iseCnt = 0, bsCnt = 0, fengiCnt = 0, chemCnt = 0, kmaCnt = 0, mkmCnt = 0;
+		playersRef.once('value', function(snapshot) {
+			snapshot.forEach(function(childSnapshot) {
+				var faculty = childSnapshot.val().faculty.toLowerCase();
+				switch(faculty) {
+					case 'фит':
+						fitCnt += 1;
+						break;
+					case 'мшэ':
+						iseCnt += 1;
+						break;
+					case 'бш':
+						bsCnt += 1;
+						break;
+					case 'ноцхи':
+						chemCnt += 1;
+						break;
+					case 'кма':
+						kmaCnt += 1;
+						break;
+					case 'мкм':
+						mkmCnt += 1;
+						break;
+					case 'фэнги':
+						fengiCnt += 1;
+						break;
+					case 'фгини':
+						fengiCnt += 1;
+						break;
+					default:
+						break;
+				}
+			});
+		});
+
+		bot.sendMessage(adminChatId,  'ФИТ: ' + fitCnt + '\n' + 
+																	'МШЭ: ' + iseCnt + '\n' + 
+																	'БШ: ' + bsCnt + '\n' + 
+																	'МКМ: ' + mkmCnt + '\n' + 
+																	'КМА: ' + kmaCnt + '\n' + 
+																	'ФЭНГИ: ' + fengiCnt + '\n' + 
+																	'НОЦХИ: ' + chemCnt);
+	}
+});
+
+bot.onText(/\/check_course/, msg => {
+	if(msg.chat.id === adminChatId) {
+		var playersRef = database.ref('/players');
+		var firstCnt = 0, secondCnt = 0, thirdCnt = 0, fourthCnt = 0; 
+		playersRef.once('value', function(snapshot) {
+			snapshot.forEach(function(childSnapshot) {
+				var course = childSnapshot.val().year;
+				switch(course) {
+					case '1':
+						firstCnt += 1;
+						break;
+					case '2':
+						secondCnt += 1;
+						break;
+					case '3':
+						thirdCnt += 1;
+						break;
+					case '4':
+						fourthCnt += 1;
+						break;
+					default:
+						break;
+				}
+			});
+		});
+
+		bot.sendMessage(adminChatId,  '1: ' + firstCnt + '\n' + 
+																	'2: ' + secondCnt + '\n' + 
+																	'3: ' + thirdCnt + '\n' + 
+																	'4: ' + fourthCnt);
+	}
+});
+
 bot.onText(/\/broadcast/, msg => {
 	if (msg.chat.id === adminChatId) {
 		var broadcastMsg = msg.text.slice(11);
@@ -359,6 +454,7 @@ function shuffle(arr) {
     return arr;
 }
 */
+
 
 
 
