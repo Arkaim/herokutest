@@ -344,11 +344,13 @@ bot.onText(/\/check_non_authorized/, msg => {
 	if(msg.chat.id === adminChatId) {
 		var playersRef = database.ref('/players');
 		playersRef.once('value', function(snapshot) {
+			var non = '';
 			snapshot.forEach(function(child) {
 				if (child.val().chat_id === undefined) {
-					bot.sendMessage(adminChatId, child.val().fname + ' ' + child.val().lname);
+					non += child.val().fname + ' ' + child.val().lname + '\n';
 				}
 			});
+			bot.sendMessage(adminChatId, non);
 		});
 	}
 });
