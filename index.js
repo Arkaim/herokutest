@@ -340,6 +340,19 @@ bot.onText(/\/check_course/, msg => {
 	}
 });
 
+bot.onText(/\/check_non_authorized/, msg => {
+	if(msg.chat.id === adminChatId) {
+		var playersRef = database.ref('/players');
+		playersRef.once('value', function(snapshot) {
+			snapshot.forEach(function(child) {
+				if (child.val().chat_id === undefined) {
+					bot.sendMessage(adminChatId, child.val().fname + ' ' + child.val().lname);
+				}
+			});
+		});
+	}
+});
+
 bot.onText(/\/broadcast/, msg => {
 	if (msg.chat.id === adminChatId) {
 		var broadcastMsg = msg.text.slice(11);
