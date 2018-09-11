@@ -27,7 +27,7 @@ const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert',
 				'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 
 				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK', 'darlaxxii', 'kenenalmat',
 				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak', 'AntiEG0', 'muraliq',
-			'hafsamufassir',];
+			'hafsamufassir', 'kuanyshbek_abdurazak'];
 
 
 bot.onText(/\/start/, msg => {
