@@ -28,6 +28,7 @@ const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert',
 				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK', 'darlaxxii', 'kenenalmat',
 				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak', 'AntiEG0', 'muraliq',
 			'hafsamufassir', 'kuanyshbek_abdurazak'];
+const superAdmins = ['Arkaim', 'Amanzhol_T'];
 
 
 bot.onText(/\/start/, msg => {
@@ -89,7 +90,7 @@ bot.onText(/\/me/, msg => {
 
 /*
 bot.onText(/\/begin_game/, msg => {
-	if (admins.includes(msg.from.username)) {
+	if (superAdmins.includes(msg.from.username)) {
 		var ref = database.ref('/players');
 		ref.once('value', function(snapshot) {
 			var players = [];
@@ -241,7 +242,7 @@ bot.onText(/\/report/, msg => {
 });
 
 bot.onText(/\/check_amount/, msg => {
-	if(msg.chat.id === adminChatId) {
+	if(superAdmins.includes(msg.from.username)) {
 		var playersRef = database.ref('/players');
 		playersRef.once('value', function(snapshot) {
 			var registeredCount = 0;
@@ -261,7 +262,7 @@ bot.onText(/\/check_amount/, msg => {
 });
 
 bot.onText(/\/check_faculty/, msg => {
-	if(msg.chat.id === adminChatId) {
+	if(superAdmins.includes(msg.from.username)) {
 		var playersRef = database.ref('/players');
 		var fitCnt = 0, iseCnt = 0, bsCnt = 0, fengiCnt = 0, chemCnt = 0, kmaCnt = 0, mkmCnt = 0;
 		playersRef.once('value', function(snapshot) {
@@ -341,7 +342,7 @@ bot.onText(/\/check_course/, msg => {
 });
 
 bot.onText(/\/check_non_authorized/, msg => {
-	if(msg.chat.id === adminChatId) {
+	if(superAdmins.includes(msg.from.username)) {
 		var playersRef = database.ref('/players');
 		playersRef.once('value', function(snapshot) {
 			var non = '';
@@ -356,7 +357,7 @@ bot.onText(/\/check_non_authorized/, msg => {
 });
 
 bot.onText(/\/broadcast/, msg => {
-	if (msg.chat.id === adminChatId) {
+	if (superAdmins.includes(msg.from.username)) {
 		var broadcastMsg = msg.text.slice(11);
 		if (broadcastMsg !== '') {
 			var registeredChatsRef = database.ref('chats');
