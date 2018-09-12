@@ -255,7 +255,7 @@ bot.onText(/\/check_amount/, msg => {
 				snap.forEach(function(childSnap) {
 					authorizedCount += 1;
 				})
-				bot.sendMessage(adminChatId, 'Registered: ' + registeredCount + '\nAuthorized: ' + authorizedCount);
+				bot.sendMessage(msg.chat.id, 'Registered: ' + registeredCount + '\nAuthorized: ' + authorizedCount);
 			});
 		});
 	}
@@ -298,7 +298,7 @@ bot.onText(/\/check_faculty/, msg => {
 			});
 		});
 
-		bot.sendMessage(adminChatId,  'ФИТ: ' + fitCnt + '\n' + 
+		bot.sendMessage(msg.chat.id,  'ФИТ: ' + fitCnt + '\n' + 
 																	'МШЭ: ' + iseCnt + '\n' + 
 																	'БШ: ' + bsCnt + '\n' + 
 																	'МКМ: ' + mkmCnt + '\n' + 
@@ -334,7 +334,7 @@ bot.onText(/\/check_course/, msg => {
 			});
 		});
 
-		bot.sendMessage(adminChatId,  '1: ' + firstCnt + '\n' + 
+		bot.sendMessage(msg.chat.id,  '1: ' + firstCnt + '\n' + 
 																	'2: ' + secondCnt + '\n' + 
 																	'3: ' + thirdCnt + '\n' + 
 																	'4: ' + fourthCnt);
@@ -351,7 +351,7 @@ bot.onText(/\/check_non_authorized/, msg => {
 					non += child.val().fname + ' ' + child.val().lname + '\n';
 				}
 			});
-			bot.sendMessage(adminChatId, non);
+			bot.sendMessage(msg.chat.id, non);
 		});
 	}
 });
