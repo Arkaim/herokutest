@@ -373,6 +373,12 @@ bot.onText(/\/broadcast/, msg => {
 		}
 	}
 });
+bot.onText(/\/islamcast/, msg => {
+	if (superAdmins.includes(msg.from.username)) {
+		var broadcastMsg = msg.text.slice(11);
+		bot.sendMessage(msg.chat.id, broadcastMsg);
+	}
+});
 /*
 bot.onText(/\/delete/, msg => {
 	if (admins.includes(msg.from.username)) {
