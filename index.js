@@ -23,11 +23,7 @@ var config = {
 var app = firebase.initializeApp(config);
 var database = firebase.database();
 const adminChatId = 100491880;
-const admins = ['Arkaim', 'Amanzhol_T', 'mashok', 'bagsolo', 'divvert', 
-				'limaea', 'fr_tam', 'AronKarataev', 'Mirasyan', 'kirill_solovyov', 
-				'Zhanserik_Shakenov', 'Tynolen', 'ElnaraK', 'darlaxxii', 'kenenalmat',
-				'zeigs', 'adil322solo', 'kuanyshbek_abdurazak', 'AntiEG0', 'muraliq',
-			'hafsamufassir', 'kuanyshbek_abdurazak'];
+const admins = ['Arkaim', 'Amanzhol_T'];
 const superAdmins = ['Arkaim', 'Amanzhol_T'];
 
 
@@ -35,6 +31,303 @@ bot.onText(/\/start/, msg => {
 	bot.sendMessage(msg.chat.id, hellomsg);
 });
 
+
+bot.onText(/\/begin_game/, msg => {
+	if (superAdmins.includes(msg.from.username)) {
+		var ref = database.ref('/players');
+		ref.once('value', function(snapshot) {
+			var players = [];
+
+			snapshot.forEach(function(childSnapshot) {
+				var chat_id = childSnapshot.val().chat_id;
+				if (chat_id !== undefined) {
+					players.push(childSnapshot);
+				}
+			});
+
+			for (var i = 0; i < players.length; i++) {
+				(function(i) {
+					setTimeout(function() {
+						bot.sendMessage(players[i].val().chat_id, 'Игра началсь, ' + players[i].val().fname + '! \n' + 'Скоро вам выдадут жертву!');
+					}, 40);
+				}(i));
+			}
+
+			players = shuffle(players);
+
+			for (var i = 0; i < players.length-1 ; i++) {
+				(function(i) {
+					setTimeout(function() {
+						var newRef = database.ref('/players/' + players[i].key + '/victim');
+						newRef.set(players[i+1].key);
+						bot.sendPhoto(players[i].val().chat_id, players[i+1].val().photo_id, {caption:  
+																'Ваша жертва: \n'   + players[i+1].val().fname + ' '
+																					+ players[i+1].val().lname + ', '
+																					+ players[i+1].val().faculty + ', '
+																					+ players[i+1].val().year });
+					}, 1000);
+				}(i));
+			}
+
+			var lastPlayer = database.ref('/players/' + players[players.length-1].key + '/victim');
+			lastPlayer.set(players[0].key);
+			bot.sendPhoto(players[players.length-1].val().chat_id, players[0].val().photo_id, {caption:  
+																'Ваша жертва: \n'   + players[0].val().fname + ' '
+																					+ players[0].val().lname + ', '
+																					+ players[0].val().faculty + ', '
+																					+ players[0].val().year });	
+		});
+	}
+});
+
+bot.onText(/\/kill/, msg => {
+	var id = msg.text.slice(6);
+	id = id.trim();
+
+	if (id !== '') {
+		var victimRef = database.ref('/players/' + id);
+		victimRef.once('value', function(snapshot) {
+			var test = snapshot.val();
+			if (test === null) {
+				bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
+			} else {
+				var killerChatRef = database.ref('chats/' + msg.chat.id);
+				killerChatRef.once('value', function(killerChatRefSnap) {
+					var killer_id = killerChatRefSnap.val();
+					var killerRef = database.ref('players/' + killer_id);
+					killerRef.once('value', function(killerSnap) {
+						if (killerSnap.val().status === 'alive') {
+							var victim_id = killerSnap.val().victim;
+							var selfKIll = 'Не знаете ли, что тела ваши суть храм живущего в вас Святого Духа, Которого имеете вы от Бога, и вы не свои? Ибо вы куплены дорогою ценою';
+							if (id === killerSnap.key) {
+								bot.sendMessage(msg.chat.id, selfKIll);
+							} 
+							else if (id === victim_id) {
+								var killer_killcount = killerSnap.val().killcount;
+								var killerKillCountRef = database.ref('players/' + killer_id + '/killcount');
+								killerKillCountRef.set(parseInt(killer_killcount)+1);
+								var killerKillListRef = database.ref('players/' + killer_id + '/kills/' + new Date());
+								killerKillListRef.set(victim_id);
+
+								var victimStatusRef = database.ref('players/' + victim_id + '/status');
+								victimStatusRef.set('dead');
+								bot.sendMessage(snapshot.val().chat_id, 'Вы были убиты!');
+
+								var nextVictimRef = database.ref('players/' + snapshot.val().victim);
+								nextVictimRef.once('value', function(nextVictimSnap) {
+									var newKillerVictimRef = database.ref('players/' + killer_id + '/victim');
+									newKillerVictimRef.set(nextVictimSnap.key);	
+									var newKillerVictimInfo = nextVictimSnap.val().fname + ' ' 
+															+ nextVictimSnap.val().lname + ', '
+															+ nextVictimSnap.val().faculty + ', '
+															+ nextVictimSnap.val().year;
+
+									bot.sendMessage(adminChatId, killerSnap.val().fname + ' ' + killerSnap.val().lname + ' ' + 
+																 killerSnap.val().faculty + ' ' + killerSnap.val().year);
+									bot.sendMessage(msg.chat.id, 'Вы убили свою жертву!');
+									setTimeout(function() {
+										bot.sendPhoto(msg.chat.id, nextVictimSnap.val().photo_id, {caption: 'Ваша следующая жертва \n' 
+																											+ newKillerVictimInfo});
+									}, 2000);
+								});
+							} else {
+								bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
+							}
+						} else {
+							bot.sendMessage(msg.chat.id, 'Вы мертвы');
+						}					
+					});
+				});
+			}
+		});
+	} else {
+		bot.sendMessage(msg.chat.id, 'Введите /kill и код вашей жертвы. Например: \n/kill abc123');
+	}
+});
+
+bot.onText(/\/code/, msg => {
+	var chatIdRef = database.ref('chats/' + msg.chat.id);
+	chatIdRef.once('value', function(snapshot) {
+		if (snapshot.val() === null) {
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
+		} else {
+			bot.sendMessage(msg.chat.id, 'Ваш секретный код: ' + snapshot.val());
+		}
+	});
+});
+
+bot.onText(/\/stats/, msg => {
+	var chatIdRef = database.ref('chats/' + msg.chat.id);
+	chatIdRef.once('value', function(snapshot) {
+		if (snapshot.val() === null) {
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
+		} else {
+			var playerRef = database.ref('players/' + snapshot.val());
+			playerRef.once('value', function(playerSnap) {
+				bot.sendMessage(msg.chat.id, 	'Имя: ' + playerSnap.val().fname + '\n' +
+												'Фамилия: ' + playerSnap.val().lname + '\n' + 
+												'Факультет: ' + playerSnap.val().faculty + '\n' + 
+												'Год обучения: ' + playerSnap.val().year + '\n' + 
+												'Статус: ' + playerSnap.val().status + '\n' + 
+												'Количество убийств: ' + playerSnap.val().killcount);
+			});
+		}
+	});
+});
+
+bot.onText(/\/rules/, msg => {
+	bot.sendMessage(msg.chat.id, "Полный список правил по ссылке: https://vk.com/@profit_kbtu-pravila-igry-slayer");
+});
+
+bot.onText(/\/report/, msg => {
+	var reportText = msg.text.slice(8);
+	if (reportText !== '') {
+		bot.sendMessage(adminChatId, 'Report from ' + msg.chat.id + '\n' + reportText);
+	}
+});
+
+
+bot.onText(/\/broadcast/, msg => {
+	if (superAdmins.includes(msg.from.username)) {
+		var broadcastMsg = msg.text.slice(11);
+		if (broadcastMsg !== '') {
+			var registeredChatsRef = database.ref('chats');
+			registeredChatsRef.once('value', function(snapshot) {
+				snapshot.forEach(function(childSnapshot) {
+					setTimeout(function() {
+						bot.sendMessage(childSnapshot.key, broadcastMsg);
+					}, 1000); 
+				});
+			});
+
+		}
+	}
+});
+
+bot.onText(/\/islamcast/, msg => {
+	if (superAdmins.includes(msg.from.username)) {
+		var broadcastMsg = msg.text.slice(11);
+		bot.sendMessage(msg.chat.id, broadcastMsg);
+	}
+});
+
+bot.onText(/\/delete/, msg => {
+	if (admins.includes(msg.from.username)) {
+		if (msg.text[7] === " ") {
+			var id = msg.text.slice(8)
+			if (id !== "") {
+				var playerRef = database.ref('/players/' + id);
+				playerRef.child('status').set('dead');
+				playerRef.once('value', function(snapshot) {
+					var chat_id = snapshot.val().chat_id;
+					bot.sendMessage(chat_id, 'Вы были дисквалифицированы');
+					var victim_id = snapshot.val().victim;
+					var prevKiller_id = '';
+
+					var playersRef = database.ref('/players');
+					playersRef.once('value', function(snapshot) {
+						snapshot.forEach(function(childSnapshot) {
+							if (childSnapshot.val().victim === id) {
+								var prevKillersVictimRef = database.ref('/players/' + childSnapshot.key + '/victim');
+								prevKillersVictimRef.set(victim_id);
+								bot.sendMessage(childSnapshot.val().chat_id, 'Ваша жертва была дисквалифицирована.');
+								var newVictimRef = database.ref('/players/' + victim_id);
+								newVictimRef.once('value', function(newVictimSnap) {
+									var newVictimInfo = newVictimSnap.val().fname + ' ' + newVictimSnap.val().lname + '\n'
+														+ newVictimSnap.val().faculty + ', ' + newVictimSnap.val().year;
+									setTimeout(function() {
+										bot.sendPhoto(childSnapshot.val().chat_id, newVictimSnap.val().photo_id, {caption: 
+											'Ваша новая жертва \n' + newVictimInfo});
+									}, 2000);
+								});
+							}
+						});
+					});
+				});
+			}		
+		}
+	}
+});
+
+bot.onText(/\/top/, msg => {
+	var playersRef = database.ref('/players');
+	playersRef.once('value', function(snapshot) {
+		var players = [];
+		snapshot.forEach(function(childSnapshot) {
+			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== undefined) {
+				players.push(childSnapshot.val());
+			}
+		});
+		players.sort(function(a, b){
+			return parseInt(a.killcount) < parseInt(b.killcount);
+		});
+		var len = players.length;
+		if (len > 10) 
+			len = 10;
+		var str = 'Топ 10 игроков: \n\n';
+		for (var i = 0; i < len; i++) {
+			str += (i + 1) + '. 😶 ' + players[i].fname + ' ' + players[i].lname + ', '
+							  + players[i].faculty + ', ' + players[i].year + ' курс, 🔪'
+							  + players[i].killcount + ' убийств' + '\n\n';
+		}
+		bot.sendMessage(msg.chat.id, str);
+	});
+});
+
+bot.onText(/\/victim/, msg => {
+	var chatRef = database.ref('/chats/' + msg.chat.id);
+	chatRef.once('value', function(snapshot) {
+		if (snapshot.val() !== null) {
+			var player_id = snapshot.val();
+			var playerRef = database.ref('players/' + player_id);
+			playerRef.once('value', function(playerSnap) {
+				var victim_id = playerSnap.val().victim;
+				var victimRef = database.ref('players/' + victim_id);
+				victimRef.once('value', function(victimSnap) {
+					var victimInfo  = victimSnap.val().fname + ' ' 
+									+ victimSnap.val().lname + ', '
+									+ victimSnap.val().faculty + ', '
+									+ victimSnap.val().year; 
+					bot.sendPhoto(msg.chat.id, victimSnap.val().photo_id, {caption: 'Ваша жертва: \n' + victimInfo});
+				});
+			});
+		} else {
+			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
+		}
+	});
+});
+
+bot.onText(/\/check_status/, msg => {
+	if(superAdmins.includes(msg.from.username)) {
+		var playersRef = database.ref('/players');
+		playersRef.once('value', function(snapshot) {
+			var alive = 0;
+			snapshot.forEach(function(child) {
+				if (child.val().status === 'alive') {
+					alive += 1;
+				}
+			});
+			bot.sendMessage(adminChatId, 'Количество живых игроков: ' + alive);
+		});
+	}
+});
+
+function shuffle(arr) {
+    var cnt = arr.length, temp, index;
+    while (cnt > 0) {
+        index = Math.floor(Math.random() * cnt);
+        cnt--;
+        temp = arr[cnt];
+        arr[cnt] = arr[index];
+        arr[index] = temp;
+    }
+    return arr;
+}
+
+
+
+
+/*
 bot.on('photo', (msg) => {
 	if (admins.includes(msg.from.username)) {
 		var ref = database.ref('players')
@@ -87,160 +380,12 @@ bot.onText(/\/me/, msg => {
 		bot.sendMessage(msg.chat.id, 'Введите /me и ваш код');
 	}
 });
-
-/*
-bot.onText(/\/begin_game/, msg => {
-	if (superAdmins.includes(msg.from.username)) {
-		var ref = database.ref('/players');
-		ref.once('value', function(snapshot) {
-			var players = [];
-
-			snapshot.forEach(function(childSnapshot) {
-				var chat_id = childSnapshot.val().chat_id;
-				if (chat_id !== undefined) {
-					players.push(childSnapshot);
-				}
-			});
-
-			for (var i = 0; i < players.length; i++) {
-				(function(i) {
-					setTimeout(function() {
-						bot.sendMessage(players[i].val().chat_id, 'Игра началсь, ' + players[i].val().fname + '! \n' + 'Скоро вам выдадут жертву!');
-					}, 40);
-				}(i));
-			}
-
-			players = shuffle(players);
-
-			for (var i = 0; i < players.length-1 ; i++) {
-				(function(i) {
-					setTimeout(function() {
-						var newRef = database.ref('/players/' + players[i].key + '/victim');
-						newRef.set(players[i+1].key);
-						bot.sendPhoto(players[i].val().chat_id, players[i+1].val().photo_id, {caption:  
-																'Ваша жертва: \n'   + players[i+1].val().fname + ' '
-																					+ players[i+1].val().lname + ', '
-																					+ players[i+1].val().faculty + ', '
-																					+ players[i+1].val().year });
-					}, 1000);
-				}(i));
-			}
-
-			var lastPlayer = database.ref('/players/' + players[players.length-1].key + '/victim');
-			lastPlayer.set(players[0].key);
-			bot.sendPhoto(players[players.length-1].val().chat_id, players[0].val().photo_id, {caption:  
-																'Ваша жертва: \n'   + players[0].val().fname + ' '
-																					+ players[0].val().lname + ', '
-																					+ players[0].val().faculty + ', '
-																					+ players[0].val().year });	
-		});
-	}
-});
 */
+
+
+
+
 /*
-bot.onText(/\/kill/, msg => {
-	var id = msg.text.slice(6);
-	id = id.trim();
-
-	if (id !== '') {
-		var victimRef = database.ref('/players/' + id);
-		victimRef.once('value', function(snapshot) {
-			var test = snapshot.val();
-			if (test === null) {
-				bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
-			} else {
-				var killerChatRef = database.ref('chats/' + msg.chat.id);
-				killerChatRef.once('value', function(killerChatRefSnap) {
-					var killer_id = killerChatRefSnap.val();
-					var killerRef = database.ref('players/' + killer_id);
-					killerRef.once('value', function(killerSnap) {
-						if (killerSnap.val().status === 'alive') {
-							var victim_id = killerSnap.val().victim;
-							var selfKIll = 'Не знаете ли, что тела ваши суть храм живущего в вас Святого Духа, Которого имеете вы от Бога, и вы не свои? Ибо вы куплены дорогою ценою';
-							if (id === killerSnap.key) {
-								bot.sendMessage(msg.chat.id, selfKIll);
-							} 
-							else if (id === victim_id) {
-								var killer_killcount = killerSnap.val().killcount;
-								var killerKillCountRef = database.ref('players/' + killer_id + '/killcount');
-								killerKillCountRef.set(parseInt(killer_killcount)+1);
-								var killerKillListRef = database.ref('players/' + killer_id + '/kills/' + new Date());
-								killerKillListRef.set(victim_id);
-
-								var victimStatusRef = database.ref('players/' + victim_id + '/status');
-								victimStatusRef.set('dead');
-								bot.sendMessage(snapshot.val().chat_id, 'Вы были убиты!');
-
-								var nextVictimRef = database.ref('players/' + snapshot.val().victim);
-								nextVictimRef.once('value', function(nextVictimSnap) {
-									var newKillerVictimRef = database.ref('players/' + killer_id + '/victim');
-									newKillerVictimRef.set(nextVictimSnap.key);	
-									var newKillerVictimInfo = nextVictimSnap.val().fname + ' ' 
-															+ nextVictimSnap.val().lname + ', '
-															+ nextVictimSnap.val().faculty + ', '
-															+ nextVictimSnap.val().year;
-
-									bot.sendMessage(msg.chat.id, 'Вы убили свою жертву!');
-									setTimeout(function() {
-										bot.sendPhoto(msg.chat.id, nextVictimSnap.val().photo_id, {caption: 'Ваша следующая жертва \n' 
-																											+ newKillerVictimInfo});
-									}, 2000);
-								});
-							} else {
-								bot.sendMessage(msg.chat.id, 'Убийство не удалось, проверьте правильность команды.');
-							}
-						} else {
-							bot.sendMessage(msg.chat.id, 'Вы мертвы');
-						}					
-					});
-				});
-			}
-		});
-	}
-});
-*/
-/*
-bot.onText(/\/code/, msg => {
-	var chatIdRef = database.ref('chats/' + msg.chat.id);
-	chatIdRef.once('value', function(snapshot) {
-		if (snapshot.val() === null) {
-			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
-		} else {
-			bot.sendMessage(msg.chat.id, 'Ваш секретный код: ' + snapshot.val());
-		}
-	});
-});
-
-bot.onText(/\/stats/, msg => {
-	var chatIdRef = database.ref('chats/' + msg.chat.id);
-	chatIdRef.once('value', function(snapshot) {
-		if (snapshot.val() === null) {
-			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
-		} else {
-			var playerRef = database.ref('players/' + snapshot.val());
-			playerRef.once('value', function(playerSnap) {
-				bot.sendMessage(msg.chat.id, 	'Имя: ' + playerSnap.val().fname + '\n' +
-												'Фамилия: ' + playerSnap.val().lname + '\n' + 
-												'Факультет: ' + playerSnap.val().faculty + '\n' + 
-												'Год обучения: ' + playerSnap.val().year + '\n' + 
-												'Статус: ' + playerSnap.val().status + '\n' + 
-												'Количество убийств: ' + playerSnap.val().killcount);
-			});
-		}
-	});
-});*/
-
-bot.onText(/\/rules/, msg => {
-	bot.sendMessage(msg.chat.id, "Полный список правил по ссылке: https://vk.com/@profit_kbtu-pravila-igry-slayer");
-});
-
-bot.onText(/\/report/, msg => {
-	var reportText = msg.text.slice(8);
-	if (reportText !== '') {
-		bot.sendMessage(adminChatId, 'Report from ' + msg.chat.id + '\n' + reportText);
-	}
-});
-
 bot.onText(/\/check_amount/, msg => {
 	if(superAdmins.includes(msg.from.username)) {
 		var playersRef = database.ref('/players');
@@ -355,134 +500,7 @@ bot.onText(/\/check_non_authorized/, msg => {
 		});
 	}
 });
-
-bot.onText(/\/broadcast/, msg => {
-	if (superAdmins.includes(msg.from.username)) {
-		var broadcastMsg = msg.text.slice(11);
-		if (broadcastMsg !== '') {
-			var registeredChatsRef = database.ref('chats');
-			registeredChatsRef.once('value', function(snapshot) {
-				snapshot.forEach(function(childSnapshot) {
-					//todo: test it
-					setTimeout(function() {
-						bot.sendMessage(childSnapshot.key, broadcastMsg);
-					}, 1000); //Изменил с 1000 до 40, дабы проверить
-				});
-			});
-
-		}
-	}
-});
-bot.onText(/\/islamcast/, msg => {
-	if (superAdmins.includes(msg.from.username)) {
-		var broadcastMsg = msg.text.slice(11);
-		bot.sendMessage(msg.chat.id, broadcastMsg);
-	}
-});
-/*
-bot.onText(/\/delete/, msg => {
-	if (admins.includes(msg.from.username)) {
-		if (msg.text[7] === " ") {
-			var id = msg.text.slice(8)
-			if (id !== "") {
-				var playerRef = database.ref('/players/' + id);
-				playerRef.child('status').set('dead');
-				playerRef.once('value', function(snapshot) {
-					var chat_id = snapshot.val().chat_id;
-					bot.sendMessage(chat_id, 'Вы были дисквалифицированы');
-					var victim_id = snapshot.val().victim;
-					var prevKiller_id = '';
-
-					var playersRef = database.ref('/players');
-					playersRef.once('value', function(snapshot) {
-						snapshot.forEach(function(childSnapshot) {
-							if (childSnapshot.val().victim === id) {
-								var prevKillersVictimRef = database.ref('/players/' + childSnapshot.key + '/victim');
-								prevKillersVictimRef.set(victim_id);
-								bot.sendMessage(childSnapshot.val().chat_id, 'Ваша жертва была дисквалифицирована.');
-								var newVictimRef = database.ref('/players/' + victim_id);
-								newVictimRef.once('value', function(newVictimSnap) {
-									var newVictimInfo = newVictimSnap.val().fname + ' ' + newVictimSnap.val().lname + '\n'
-														+ newVictimSnap.val().faculty + ', ' + newVictimSnap.val().year;
-									setTimeout(function() {
-										bot.sendPhoto(childSnapshot.val().chat_id, newVictimSnap.val().photo_id, {caption: 
-											'Ваша новая жертва \n' + newVictimInfo});
-									}, 2000);
-								});
-							}
-						});
-					});
-				});
-			}		
-		}
-	}
-});
-
-//todo: if chat_id !== null
-
-
-bot.onText(/\/top/, msg => {
-	var playersRef = database.ref('/players');
-	playersRef.once('value', function(snapshot) {
-		var players = [];
-		snapshot.forEach(function(childSnapshot) {
-			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== undefined) {
-				players.push(childSnapshot.val());
-			}
-		});
-		players.sort(function(a, b){
-			return parseInt(a.killcount) < parseInt(b.killcount);
-		});
-		var len = players.length;
-		if (len > 10) 
-			len = 10;
-		var str = 'Топ 10 игроков: \n\n';
-		for (var i = 0; i < len; i++) {
-			str += (i + 1) + '. 😶 ' + players[i].fname + ' ' + players[i].lname + ', '
-							  + players[i].faculty + ', ' + players[i].year + ' курс, 🔪'
-							  + players[i].killcount + ' убийств' + '\n\n';
-		}
-		bot.sendMessage(msg.chat.id, str);
-	});
-});
-
-bot.onText(/\/victim/, msg => {
-	var chatRef = database.ref('/chats/' + msg.chat.id);
-	chatRef.once('value', function(snapshot) {
-		if (snapshot.val() !== null) {
-			var player_id = snapshot.val();
-			var playerRef = database.ref('players/' + player_id);
-			playerRef.once('value', function(playerSnap) {
-				var victim_id = playerSnap.val().victim;
-				var victimRef = database.ref('players/' + victim_id);
-				victimRef.once('value', function(victimSnap) {
-					var victimInfo  = victimSnap.val().fname + ' ' 
-									+ victimSnap.val().lname + ', '
-									+ victimSnap.val().faculty + ', '
-									+ victimSnap.val().year; 
-					bot.sendPhoto(msg.chat.id, victimSnap.val().photo_id, {caption: 'Ваша жертва: \n' + victimInfo});
-				});
-			});
-		} else {
-			bot.sendMessage(msg.chat.id, 'Вы не авторизованы');
-		}
-	});
-});
-
-function shuffle(arr) {
-    var cnt = arr.length, temp, index;
-    while (cnt > 0) {
-        index = Math.floor(Math.random() * cnt);
-        cnt--;
-        temp = arr[cnt];
-        arr[cnt] = arr[index];
-        arr[index] = temp;
-    }
-    return arr;
-}
 */
-
-
 
 
 /*
