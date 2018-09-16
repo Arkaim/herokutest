@@ -284,11 +284,13 @@ bot.onText(/\/victim/, msg => {
 				var victim_id = playerSnap.val().victim;
 				var victimRef = database.ref('players/' + victim_id);
 				victimRef.once('value', function(victimSnap) {
-					var victimInfo  = victimSnap.val().fname + ' ' 
+					if (victimSnap.val() !== null) {
+						var victimInfo  = victimSnap.val().fname + ' ' 
 									+ victimSnap.val().lname + ', '
 									+ victimSnap.val().faculty + ', '
 									+ victimSnap.val().year; 
-					bot.sendPhoto(msg.chat.id, victimSnap.val().photo_id, {caption: 'Ваша жертва: \n' + victimInfo});
+						bot.sendPhoto(msg.chat.id, victimSnap.val().photo_id, {caption: 'Ваша жертва: \n' + victimInfo});
+					}
 				});
 			});
 		} else {
