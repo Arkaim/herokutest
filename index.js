@@ -321,7 +321,7 @@ bot.onText(/\/check_todelete/, msg => {
 			var str = 'To delete: \n\n';
 			snapshot.forEach(function(child) {
 				if (child.val().status === 'alive' && child.val().killcount === 0) {
-					str += child.val().code + ' ' + child.val().fname + ' ' + child.val().lname + '\n';
+					str += child.key + ' ' + child.val().fname + ' ' + child.val().lname + '\n';
 				}
 			});
 			bot.sendMessage(adminChatId, str);
