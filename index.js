@@ -211,6 +211,8 @@ bot.onText(/\/islamcast/, msg => {
 	}
 });
 
+
+
 bot.onText(/\/delete/, msg => {
 	if (admins.includes(msg.from.username)) {
 		if (msg.text[7] === " ") {
@@ -227,10 +229,10 @@ bot.onText(/\/delete/, msg => {
 					var playersRef = database.ref('/players');
 					playersRef.once('value', function(snapshot) {
 						snapshot.forEach(function(childSnapshot) {
-							if (childSnapshot.val().victim === id) {
+							if (childSnapshot.val().victim === id && childSnapshot.val().status === 'alive') {
 								var prevKillersVictimRef = database.ref('/players/' + childSnapshot.key + '/victim');
 								prevKillersVictimRef.set(victim_id);
-								bot.sendMessage(childSnapshot.val().chat_id, 'Ваша жертва была дисквалифицирована.');
+								bot.sendMessage(childSnapshot.val().chat_id, 'Ваша жертва была дисквалифицриована.');
 								var newVictimRef = database.ref('/players/' + victim_id);
 								newVictimRef.once('value', function(newVictimSnap) {
 									var newVictimInfo = newVictimSnap.val().fname + ' ' + newVictimSnap.val().lname + '\n'
