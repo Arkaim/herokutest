@@ -314,6 +314,21 @@ bot.onText(/\/check_status/, msg => {
 	}
 });
 
+bot.onText(/\/check_todelete/, msg => {
+	if(superAdmins.includes(msg.from.username)) {
+		var playersRef = database.ref('/players');
+		playersRef.once('value', function(snapshot) {
+			var str = 'To delete: \n\n';
+			snapshot.forEach(function(child) {
+				if (child.val().status === 'alive' && child.val().killcount === 0) {
+					str += child.val().code + ' ' + child.val().fname + ' ' + child.val().lname + '\n';
+				}
+			});
+			bot.sendMessage(adminChatId, str);
+		});
+	}
+});
+
 function shuffle(arr) {
     var cnt = arr.length, temp, index;
     while (cnt > 0) {
