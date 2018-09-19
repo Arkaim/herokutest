@@ -276,7 +276,7 @@ bot.onText(/\/top/, msg => {
 	});
 });
 
-bot.onText(/\/top_all/, msg => {
+bot.onText(/\/all/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.ref.orderByChild('killcount').once('value', function(snapshot) {
 		var players = [];
