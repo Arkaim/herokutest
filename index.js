@@ -251,6 +251,7 @@ bot.onText(/\/delete/, msg => {
 	}
 });
 
+/*
 bot.onText(/\/top/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.ref.orderByChild('killcount').once('value', function(snapshot) {
@@ -260,9 +261,7 @@ bot.onText(/\/top/, msg => {
 				players.push(childSnapshot.val());
 			}
 		});
-		/*players.sort(function(a, b){
-			return parseInt(a.killcount) < parseInt(b.killcount);
-		});*/
+		
 		players = players.reverse();
 		var len = players.length;
 		if (len > 10) 
@@ -275,8 +274,9 @@ bot.onText(/\/top/, msg => {
 		bot.sendMessage(msg.chat.id, str);
 	});
 });
+*/
 
-bot.onText(/\/all/, msg => {
+bot.onText(/\/top/, msg => {
 	var playersRef = database.ref('/players');
 	playersRef.ref.orderByChild('killcount').once('value', function(snapshot) {
 		var players = [];
