@@ -276,6 +276,28 @@ bot.onText(/\/top/, msg => {
 	});
 });
 
+bot.onText(/\/top_all/, msg => {
+	var playersRef = database.ref('/players');
+	playersRef.ref.orderByChild('killcount').once('value', function(snapshot) {
+		var players = [];
+		snapshot.forEach(function(childSnapshot) {
+			if (childSnapshot.val().status === 'alive' && childSnapshot.val().chat_id !== undefined) {
+				players.push(childSnapshot.val());
+			}
+		});
+
+		players = players.reverse();
+		var len = players.length;
+		
+		var str = 'Топ всех игроков: \n\n';
+		for (var i = 0; i < len; i++) {
+			str += (i + 1) + '. ' + players[i].fname + ' ' + players[i].lname + ', '
+							  + players[i].killcount + ' убийств' + '\n';
+		}
+		bot.sendMessage(msg.chat.id, str);
+	});
+});
+
 bot.onText(/\/victim/, msg => {
 	var chatRef = database.ref('/chats/' + msg.chat.id);
 	chatRef.once('value', function(snapshot) {
